@@ -172,7 +172,7 @@ ipcMain.handle('auth:login', async (event, { username, pin }) => {
       // Auto-open shift if none exists
       const activeSession = db.db.prepare("SELECT * FROM register_sessions WHERE cashier_id = ? AND is_closed = 0").get(user.id);
       if (!activeSession) {
-        db.db.prepare('INSERT INTO register_sessions (session_id, cashier_id, opening_balance_cents) VALUES (?, ?, ?)').run(crypto.randomUUID(), user.id, 500000); // 5000 LKR default float
+        db.db.prepare('INSERT INTO register_sessions (session_id, cashier_id, opening_balance_cents) VALUES (?, ?, ?)').run(crypto.randomUUID(), user.id, 0); // 0 LKR default float
       }
       
       return { success: true, role: user.role };
@@ -192,7 +192,7 @@ ipcMain.handle('auth:unlock', async (event, pin) => {
     // Auto-open shift if none exists
     const activeSession = db.db.prepare("SELECT * FROM register_sessions WHERE cashier_id = ? AND is_closed = 0").get(currentUser.id);
     if (!activeSession) {
-      db.db.prepare('INSERT INTO register_sessions (session_id, cashier_id, opening_balance_cents) VALUES (?, ?, ?)').run(crypto.randomUUID(), currentUser.id, 500000); // 5000 LKR default float
+      db.db.prepare('INSERT INTO register_sessions (session_id, cashier_id, opening_balance_cents) VALUES (?, ?, ?)').run(crypto.randomUUID(), currentUser.id, 0); // 0 LKR default float
     }
 
     return { success: true, role: currentUser.role };
