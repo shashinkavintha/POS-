@@ -859,16 +859,16 @@ async function openShiftClose() {
   shiftCloseModal.classList.remove('hidden');
   actualCashInput.value = '';
   actualCashInput.focus();
-  
+  expectedCashCents = 0;
   if (window.posAPI && window.posAPI.getExpectedCash) {
-    const res = await window.posAPI.getExpectedCash();
-    if (res.success) {
-      expectedCashCents = res.expectedCashCents;
-    } else {
-      expectedCashCents = 0;
+    try {
+      const res = await window.posAPI.getExpectedCash();
+      if (res && res.success) {
+        expectedCashCents = res.expectedCashCents;
+      }
+    } catch (err) {
+      console.error("Failed to fetch expected cash:", err);
     }
-  } else {
-    expectedCashCents = 500000; // 5000 LKR in cents (Mock)
   }
   
   expectedCashVal.textContent = `LKR ${(expectedCashCents / 100).toFixed(2)}`;
