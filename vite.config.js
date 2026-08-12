@@ -6,6 +6,12 @@ export default defineConfig({
   base: './',
   build: {
     outDir: '../dist',
-    emptyOutDir: true
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'src/index.html'),
+        admin: path.resolve(__dirname, 'src/admin.html')
+      }
+    }
   }
 });

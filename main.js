@@ -73,6 +73,7 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js'),
+      webSecurity: false // Required for loading Vite ES modules over file:// protocol
     },
   });
 
