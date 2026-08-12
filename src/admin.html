@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:;">
+  <title>Admin Dashboard - Grocery POS</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Sinhala:wght@400;600&family=Noto+Sans+Tamil:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="admin-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h2>Admin Panel</h2>
+        <p class="subtitle">Grocery POS System</p>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+        <button class="nav-btn" data-tab="inventory">Inventory & GRN</button>
+        <button class="nav-btn" data-tab="naya">Naya Potha (Credit)</button>
+        <button class="nav-btn" data-tab="shifts">Shift Audits</button>
+        <button class="nav-btn" data-tab="sales">Sales History</button>
+        <button class="nav-btn" data-tab="settings">Settings</button>
+      </nav>
+      <div class="sidebar-footer">
+        <button id="btn-back-to-pos" class="btn-large" style="width: 100%; background: var(--danger-color); color: #fff;">Back to POS</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content-area">
+      
+      <!-- Dashboard Tab -->
+      <section id="tab-dashboard" class="tab-content active">
+        <header style="display: flex; justify-content: space-between; align-items: center;">
+          <h1>Overview</h1>
+          <button id="btn-export-csv" class="btn-primary">Export Sales Data (CSV)</button>
+        </header>
+        <div class="dashboard-grid">
+          <div class="stat-card">
+            <h3>Today's Revenue</h3>
+            <div class="stat-value" id="stat-revenue">LKR 0.00</div>
+          </div>
+          <div class="stat-card">
+            <h3>Net Profit (FIFO)</h3>
+            <div class="stat-value text-green" id="stat-profit">LKR 0.00</div>
+          </div>
+          <div class="stat-card">
+            <h3>Low Stock Items</h3>
+            <div class="stat-value text-red" id="stat-low-stock">0</div>
+          </div>
+          <div class="stat-card">
+            <h3>Expiring Soon (<30d)</h3>
+            <div class="stat-value text-amber" id="stat-expiring">0</div>
+          </div>
+        </div>
+        <div class="card" style="margin-top: 2rem;">
+          <h2>Profit Breakdown (By Product)</h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Units Sold</th>
+                <th>Gross Revenue</th>
+                <th>Net Profit</th>
+              </tr>
+            </thead>
+            <tbody id="pnl-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Inventory Tab -->
+      <section id="tab-inventory" class="tab-content hidden">
+        <header>
+          <h1>Inventory & GRN</h1>
+          <div style="display: flex; gap: 10px;">
+            <button id="btn-add-product" class="btn" style="background: var(--bg-darker); border: 1px solid var(--border-color); color: #fff;">Add New Product</button>
+            <button id="btn-add-batch" class="btn-primary">Receive New Stock (GRN)</button>
+          </div>
+        </header>
+        <div class="card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product Name</th>
+                <th>Barcode</th>
+                <th>Current Stock</th>
+                <th>Avg Selling Price</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Naya Potha Tab -->
+      <section id="tab-naya" class="tab-content hidden">
+        <header>
+          <h1>ණය පොත / Credit Sales</h1>
+        </header>
+        <div class="card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Customer ID / NIC</th>
+                <th>Total Credit (LKR)</th>
+                <th>Last Update</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="naya-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Shifts Tab -->
+      <section id="tab-shifts" class="tab-content hidden">
+        <header>
+          <h1>End of Day (Shift Reports)</h1>
+        </header>
+        <div class="card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Cashier Name</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Expected Cash</th>
+                <th>Actual Cash</th>
+                <th>Discrepancy</th>
+              </tr>
+            </thead>
+            <tbody id="shifts-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+        
+        <!-- Deep Dive Drawer -->
+        <div id="shift-details-drawer" class="drawer hidden">
+          <div class="drawer-header">
+            <h2>Shift Details</h2>
+            <button id="btn-close-drawer" class="btn-close">Close</button>
+          </div>
+          <div class="drawer-content">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Time</th>
+                  <th>Amount</th>
+                  <th>Payment Mode</th>
+                </tr>
+              </thead>
+              <tbody id="shift-details-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Sales History Tab -->
+      <section id="tab-sales" class="tab-content hidden">
+        <header>
+          <h1>Sales History</h1>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <label style="color: var(--text-muted);">Filter:</label>
+            <select id="sales-filter" class="search-input" style="width: auto; padding: 5px; height: 35px; font-size: 0.9rem;">
+              <option value="today">Today</option>
+              <option value="all">All Time</option>
+            </select>
+          </div>
+        </header>
+        <div class="card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Invoice ID</th>
+                <th>Time</th>
+                <th>Amount</th>
+                <th>Payment Mode</th>
+                <th>Customer ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="sales-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Settings Tab -->
+      <section id="tab-settings" class="tab-content hidden">
+        <header>
+          <h1>Shop Settings</h1>
+        </header>
+        <div class="card" style="max-width: 600px;">
+          <form id="settings-form" style="display: flex; flex-direction: column; gap: 15px;">
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              <label style="color: var(--text-muted); font-size: 0.9rem;">Shop Name</label>
+              <input type="text" id="setting-shop-name" class="search-input" required>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              <label style="color: var(--text-muted); font-size: 0.9rem;">Shop Address</label>
+              <input type="text" id="setting-shop-address" class="search-input" required>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 5px;">
+              <label style="color: var(--text-muted); font-size: 0.9rem;">Phone Number</label>
+              <input type="text" id="setting-shop-phone" class="search-input" required>
+            </div>
+            <button type="submit" class="btn-primary" style="margin-top: 10px; width: 150px;">Save Settings</button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Sales Details Modal -->
+  <div id="sales-details-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 500px;">
+      <h2>Invoice <span id="sd-invoice-id"></span></h2>
+      <div style="margin-top: 15px; max-height: 300px; overflow-y: auto;">
+        <table class="data-table" style="font-size: 0.9rem;">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="sd-items-body">
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button id="btn-close-sales-details" class="btn-small">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settlement Modal -->
+  <div id="settlement-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 400px; text-align: center; border-top: 5px solid var(--primary-color);">
+      <h2>Settle Credit</h2>
+      <p id="settle-customer-name" style="margin-bottom: 20px;"></p>
+      <div class="search-bar">
+        <input type="number" id="settle-amount-input" class="search-input" placeholder="Amount (LKR)" style="text-align: center; font-size: 20px; height: 48px;">
+      </div>
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button id="btn-submit-settlement" class="btn-large btn-primary" style="background: var(--primary-color); color: #000;">Process Settlement</button>
+        <button id="btn-cancel-settlement" class="btn-small">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Product Modal -->
+  <div id="product-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 500px;">
+      <h2 id="product-modal-title">Add New Product</h2>
+      <form id="product-form" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+        <input type="hidden" id="product-id">
+        <input type="text" id="prod-name-en" class="search-input" placeholder="English Name" required>
+        <input type="text" id="prod-name-si" class="search-input" placeholder="Sinhala Name">
+        <input type="text" id="prod-name-ta" class="search-input" placeholder="Tamil Name">
+        <input type="text" id="prod-barcode" class="search-input" placeholder="Barcode (Optional)">
+        <div style="display: flex; gap: 10px;">
+          <input type="number" id="prod-price" class="search-input" placeholder="Default Selling Price (LKR)" step="0.01" style="flex: 1;">
+          <input type="number" id="prod-reorder" class="search-input" placeholder="Reorder Point" step="0.01" style="flex: 1;">
+        </div>
+        <select id="prod-tax-class" class="search-input" style="background: var(--bg-dark); color: #fff; border: 1px solid var(--border-color);">
+          <option value="NONE">No Tax</option>
+          <option value="VAT18">VAT 18%</option>
+          <option value="VAT15">VAT 15%</option>
+        </select>
+        <label style="display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-muted);">
+          <input type="checkbox" id="prod-weighable"> Is this a weighable item? (e.g. Loose Sugar, Dhal)
+        </label>
+        <div class="modal-actions">
+          <button type="submit" class="btn-large btn-primary" style="background: var(--primary-color); color: #000; flex: 1;">Save Product</button>
+          <button type="button" id="btn-cancel-product" class="btn-small">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- GRN Modal -->
+  <div id="grn-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 500px;">
+      <h2>Receive New Stock (GRN)</h2>
+      <form id="grn-form" style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+        <select id="grn-product-select" class="search-input" required style="background: var(--bg-dark); color: #fff; border: 1px solid var(--border-color);">
+          <option value="">-- Select Product --</option>
+        </select>
+        <div style="display: flex; gap: 10px;">
+          <input type="number" id="grn-cost" class="search-input" placeholder="Cost Price (LKR)" step="0.01" required style="flex: 1;">
+          <input type="number" id="grn-sell" class="search-input" placeholder="Selling Price (LKR)" step="0.01" required style="flex: 1;">
+        </div>
+        <input type="number" id="grn-qty" class="search-input" placeholder="Received Quantity" step="0.001" required>
+        <label style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: -10px;">Expiry Date (Optional)</label>
+        <input type="date" id="grn-expiry" class="search-input">
+        
+        <div class="modal-actions">
+          <button type="submit" class="btn-large btn-primary" style="background: var(--primary-color); color: #000; flex: 1;">Process GRN</button>
+          <button type="button" id="btn-cancel-grn" class="btn-small">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="admin.js" type="module"></script>
+</body>
+</html>

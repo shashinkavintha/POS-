@@ -1,0 +1,408 @@
+:root {
+  --bg-color: #121212;
+  --surface-color: #1e1e1e;
+  --primary-color: #00e676;
+  --primary-variant: #00c853;
+  --secondary-color: #03dac6;
+  --text-primary: #ffffff;
+  --text-secondary: #aaaaaa;
+  --danger-color: #cf6679;
+  --border-color: #333333;
+  --font-si: 'Noto Sans Sinhala', sans-serif;
+  --font-ta: 'Noto Sans Tamil', sans-serif;
+  --pos-line-height: 1.8;
+  --expansion-buffer: 40%;
+  --naya-amber: #FFBF00;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', 'Noto Sans Sinhala', 'Noto Sans Tamil', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.6;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  height: 100vh;
+  overflow: hidden;
+}
+
+#app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 1100px; /* POS Terminals need minimum width */
+  overflow-x: auto;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  min-height: 70px;
+  flex-shrink: 0;
+  background-color: var(--surface-color);
+  border-bottom: 1px solid var(--border-color);
+  gap: 1rem;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
+/* Status Dot pulsing animation */
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 1rem;
+}
+
+.status-dot.online {
+  background-color: #00e676; /* online green */
+  box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.7);
+  animation: pulse-online 1.8s infinite;
+}
+
+.status-dot.offline {
+  background-color: #ff5252;
+  box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7);
+  animation: pulse-offline 1.8s infinite;
+}
+
+@keyframes pulse-online {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 230, 118, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(0, 230, 118, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 230, 118, 0); }
+}
+
+@keyframes pulse-offline {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 82, 82, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(255, 82, 82, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 82, 82, 0); }
+}
+
+.pos-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.products-section {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  border-right: 1px solid var(--border-color);
+}
+
+.search-bar {
+  margin-bottom: 1rem;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 1rem 1rem 1rem 2.5rem;
+  font-size: 1.2rem;
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 8px;
+  outline: none;
+}
+.search-bar input:focus { border-color: var(--primary-color); }
+
+.cart-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface-color);
+}
+
+.cart-header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.cart-summary {
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+  background-color: #1a1a1a;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.summary-row.total {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.total-display-card {
+  background: linear-gradient(135deg, #1e1e1e 0%, #252525 100%);
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-amount {
+  font-size: 32px;
+  font-weight: 800;
+  color: #ffffff; 
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: background-color 0.2s, opacity 0.2s, filter 0.2s;
+  min-height: 48px; /* 48dp minimum touch target */
+  min-width: 48px;
+  padding: 0.5rem 1.5rem; /* Trilingual horizontal buffer */
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+
+.btn-secondary {
+  background-color: #333333;
+  color: #ffffff;
+  border: 1px solid #444;
+}
+
+.btn-secondary:hover {
+  background-color: #444444;
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+  color: #ffffff;
+}
+
+.btn-danger:hover {
+  filter: brightness(1.2);
+}
+
+.btn-ghost-danger {
+  background-color: transparent;
+  color: #ccc;
+  border: 1px solid #777;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-ghost-danger:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-pos-primary {
+  background-color: #475569; /* Slate Matte */
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-pos-primary:hover {
+  background-color: #334155;
+}
+
+.btn-sys-admin {
+  background-color: #2d2d2d;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-sys-admin:hover {
+  background-color: #3d3d3d;
+}
+
+.btn-sys-sync {
+  background-color: #26a69a; /* Subtle Mint */
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-sys-sync:hover {
+  background-color: #4db6ac;
+}
+
+.btn-sys-scale {
+  background-color: #ffb300; /* Amber */
+  color: #000000;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-sys-scale:hover {
+  background-color: #ffca28;
+}
+
+.bill-list-item {
+  background-color: #1e1e1e;
+  border: 1px solid #2d2d2d;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bill-list-item:hover {
+  border-color: #444;
+}
+
+.btn-checkout {
+  width: 100%;
+  padding: 1rem 15%; /* Trilingual buffer */
+  font-size: 1.5rem;
+  background-color: var(--primary-color);
+  color: #000;
+}
+.btn-checkout:hover:not(:disabled) { background-color: var(--primary-variant); }
+
+.checkout-btn {
+  width: 100%;
+  background-color: #00bfa5;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 18px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+
+.checkout-btn:hover {
+  background-color: #009688;
+  box-shadow: 0 6px 20px rgba(0, 191, 165, 0.4);
+}
+.checkout-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  filter: grayscale(100%);
+  box-shadow: none;
+}
+
+.search-container {
+  position: relative;
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  padding: 16px 16px 16px 48px; /* වමෙන් icon එකට ඉඩ තියනවා */
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: #00e676; /* focus වෙද්දි ලස්සන green line එකක් */
+  box-shadow: 0 0 8px rgba(0, 230, 118, 0.2);
+  outline: none;
+}
+
+/* Modals */
+.modal {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal.hidden { display: none; }
+
+.modal-content {
+  background-color: var(--surface-color);
+  padding: 2rem 4rem; /* Safe padding for Trilingual Support */
+  border-radius: 12px;
+  width: 500px;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.payment-options {
+  display: flex;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.btn-pay {
+  flex: 1;
+  padding: 1.5rem;
+  font-size: 1.2rem;
+}
+.btn-pay.cash { background-color: #4caf50; color: white; }
+.btn-pay.lankaqr { background-color: #03dac6; color: black; }
+
+.qr-container {
+  margin: 1.5rem auto;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  width: 256px;
+  height: 256px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.qr-container.hidden { display: none; }
+
+.btn-close {
+  margin-top: 1rem;
+  padding: 0.5rem 2rem;
+  background-color: var(--border-color);
+  color: white;
+}
+
+/* Phase 10: Barcode Print Styles */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #barcode-print-area, #barcode-print-area * {
+    visibility: visible;
+  }
+  #barcode-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 72mm;
+    padding: 2mm;
+    text-align: center;
+    page-break-after: always;
+  }
+  .barcode-svg {
+    max-width: 100%;
+    height: auto;
+  }
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+}
+
+.hidden { display: none !important; }
